@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Controllers\Admin\AuthController as AdminAuthController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Controllers\Publish\AuthController as PublishAuthController;
+use App\Controllers\Publish\DashboardController as PublishDashboardController;
+use App\Controllers\Publish\PasswordController as PublishPasswordController;
 use App\Controllers\BrowseController;
 use App\Controllers\EditionController;
 use App\Controllers\HomeController;
@@ -40,6 +43,24 @@ $router->get('/paper/{slug}/article/{article}', [NewspaperController::class, 'ar
 $router->get('/paper/{slug}/editions', [EditionController::class, 'archive']);
 $router->get('/paper/{slug}/editions/{id}', [EditionController::class, 'show']);
 $router->get('/paper/{slug}/editions/{id}/pdf', [EditionController::class, 'pdf']);
+
+// ---------------------------------------------------------------------------
+// Publisher accounts
+// ---------------------------------------------------------------------------
+$router->get('/publish/register', [PublishAuthController::class, 'showRegister']);
+$router->post('/publish/register', [PublishAuthController::class, 'register']);
+$router->get('/publish/register/sent', [PublishAuthController::class, 'registerSent']);
+$router->get('/publish/verify', [PublishAuthController::class, 'verify']);
+$router->post('/publish/verify/resend', [PublishAuthController::class, 'resendVerify']);
+$router->get('/publish/login', [PublishAuthController::class, 'showLogin']);
+$router->post('/publish/login', [PublishAuthController::class, 'login']);
+$router->post('/publish/logout', [PublishAuthController::class, 'logout']);
+$router->get('/publish/forgot', [PublishPasswordController::class, 'showForgot']);
+$router->post('/publish/forgot', [PublishPasswordController::class, 'forgot']);
+$router->get('/publish/reset', [PublishPasswordController::class, 'showReset']);
+$router->post('/publish/reset', [PublishPasswordController::class, 'reset']);
+
+$router->get('/publish', [PublishDashboardController::class, 'index']);
 
 // ---------------------------------------------------------------------------
 // Admin

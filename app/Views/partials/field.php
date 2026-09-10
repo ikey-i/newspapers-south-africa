@@ -16,7 +16,7 @@ $name = $name ?? '';
 $label = $label ?? '';
 $type = $type ?? 'text';
 $required = $required ?? false;
-$value = $value ?? old($name);
+$value = ($type ?? 'text') === 'password' ? '' : ($value ?? old($name));
 $error = $error ?? '';
 $hint = $hint ?? '';
 $placeholder = $placeholder ?? '';

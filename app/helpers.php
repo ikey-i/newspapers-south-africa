@@ -211,6 +211,27 @@ if (!function_exists('admin_view')) {
     }
 }
 
+if (!function_exists('publish_view')) {
+    /**
+     * Render a publisher-dashboard view inside the publisher layout and echo it.
+     */
+    function publish_view(string $name, array $data = []): void
+    {
+        header('X-Robots-Tag: noindex, nofollow');
+
+        $content = view($name, $data);
+
+        echo view('publish/layout', [
+            'content' => $content,
+            'heading' => (string) ($data['heading'] ?? 'Publisher'),
+            'title'   => ((string) ($data['heading'] ?? 'Publisher')) . ' — ' . config('app.name'),
+            'user'    => $data['user'] ?? \App\Support\PublisherAuth::user(),
+            'success' => flash_pull('publish_success'),
+            'notice'  => flash_pull('publish_notice'),
+        ]);
+    }
+}
+
 if (!function_exists('render_error_page')) {
     /**
      * Render a friendly error page for the given HTTP status code.
