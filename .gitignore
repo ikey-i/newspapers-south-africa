@@ -1,0 +1,35 @@
+# Local configuration (contains secrets)
+/config.php
+
+# Dependencies (dev-only, never deployed)
+/vendor/
+composer.lock
+
+# Local runtime data (logged emails, caches)
+/var/
+
+# User uploads: keep the directory structure and the hardening .htaccess,
+# ignore everything that gets uploaded.
+/uploads/*
+!/uploads/.htaccess
+!/uploads/logos/
+!/uploads/heroes/
+!/uploads/covers/
+!/uploads/media/
+!/uploads/pdfs/
+/uploads/logos/*
+/uploads/heroes/*
+/uploads/covers/*
+/uploads/media/*
+/uploads/pdfs/*
+!/uploads/*/.gitkeep
+
+# Local dev / editor
+/.idea/
+/.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# PHP built-in server / tooling cache
+/.php-cs-fixer.cache

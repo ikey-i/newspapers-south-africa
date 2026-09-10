@@ -1,0 +1,10 @@
+# Normalise line endings: LF in the repository for all text files.
+# The site is deployed to Linux hosting, so keep everything LF.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
