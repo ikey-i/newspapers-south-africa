@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Controllers\Admin\AuthController as AdminAuthController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Controllers\Admin\ArticlesController as AdminArticlesController;
+use App\Controllers\Admin\EditionsController as AdminEditionsController;
 use App\Controllers\Admin\NewspapersController as AdminNewspapersController;
 use App\Controllers\Admin\PublishersController as AdminPublishersController;
 use App\Controllers\Admin\SettingsController as AdminSettingsController;
@@ -103,6 +105,14 @@ $router->get('/admin/newspapers/{id}/edit', [AdminNewspapersController::class, '
 $router->post('/admin/newspapers/{id}', [AdminNewspapersController::class, 'update']);
 $router->post('/admin/newspapers/{id}/delete', [AdminNewspapersController::class, 'destroy']);
 $router->post('/admin/newspapers/{id}/{action}', [AdminNewspapersController::class, 'setStatus']);
+
+$router->get('/admin/articles', [AdminArticlesController::class, 'index']);
+$router->post('/admin/articles/{id}/unpublish', [AdminArticlesController::class, 'unpublish']);
+$router->post('/admin/articles/{id}/delete', [AdminArticlesController::class, 'destroy']);
+
+$router->get('/admin/editions', [AdminEditionsController::class, 'index']);
+$router->post('/admin/editions/{id}/unpublish', [AdminEditionsController::class, 'unpublish']);
+$router->post('/admin/editions/{id}/delete', [AdminEditionsController::class, 'destroy']);
 
 $router->get('/admin/publishers', [AdminPublishersController::class, 'index']);
 $router->post('/admin/publishers/{id}/toggle', [AdminPublishersController::class, 'toggleActive']);

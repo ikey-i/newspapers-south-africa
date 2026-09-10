@@ -9,6 +9,8 @@ $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $nav = [
     'admin'            => 'Dashboard',
     'admin/newspapers' => 'Newspapers',
+    'admin/articles'   => 'Articles',
+    'admin/editions'   => 'Editions',
     'admin/publishers' => 'Publishers',
     'admin/settings'   => 'Settings',
 ];
