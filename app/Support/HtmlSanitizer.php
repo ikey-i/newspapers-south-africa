@@ -103,6 +103,21 @@ final class HtmlSanitizer
         // Clean descendants first.
         self::cleanChildren($node, $doc);
 
+        // The editor's single "heading" button emits <h1>; the article already
+        // has the headline as <h1>, so demote editor headings to <h2>.
+        if (in_array($tag, ['h1', 'h5', 'h6'], true)) {
+            $node = self::rename($node, $tag === 'h1' ? 'h2' : 'h4', $doc);
+            $tag = strtolower($node->nodeName);
+        } elseif ($tag === 'div') {
+            // Trix emits each text block as a <div>; make it a <p> unless it
+            // contains block-level children (then just unwrap it).
+            $node = self::hasBlockChild($node) ? self::unwrapReturn($node) : self::rename($node, 'p', $doc);
+            if ($node === null) {
+                return;
+            }
+            $tag = strtolower($node->nodeName);
+        }
+
         if (!in_array($tag, self::ALLOWED, true)) {
             self::unwrap($node);
             return;
@@ -154,6 +169,35 @@ final class HtmlSanitizer
         }
     }
 
+    private const BLOCK = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'pre', 'figure', 'div', 'hr', 'table'];
+
+    private static function hasBlockChild(DOMElement $el): bool
+    {
+        foreach ($el->childNodes as $child) {
+            if ($child instanceof DOMElement && in_array(strtolower($child->nodeName), self::BLOCK, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Rename an element, keeping its children and (filtered later) attributes. */
+    private static function rename(DOMElement $el, string $newName, DOMDocument $doc): DOMElement
+    {
+        $new = $doc->createElement($newName);
+        while ($el->firstChild !== null) {
+            $new->appendChild($el->firstChild);
+        }
+        $el->parentNode?->replaceChild($new, $el);
+        return $new;
+    }
+
+    private static function unwrapReturn(DOMElement $el): ?DOMElement
+    {
+        self::unwrap($el);
+        return null;
+    }
+
     /** Replace an element with its children. */
     private static function unwrap(DOMElement $el): void
     {
@@ -191,7 +235,9 @@ final class HtmlSanitizer
         if ($src === '' || preg_match('/[\x00-\x1f]/', $src) === 1) {
             return null;
         }
-        if (preg_match('#^/uploads/(media|heroes|covers|logos)/[A-Za-z0-9._/-]+$#', $src) === 1) {
+        // Site-relative upload path (tolerates a base-path prefix for subdir installs).
+        if (str_starts_with($src, '/')
+            && preg_match('#^/[A-Za-z0-9._/-]*uploads/(media|heroes|covers|logos)/[A-Za-z0-9._-]+$#', $src) === 1) {
             return $src;
         }
         if (preg_match('#^https://[^\s"\'<>]+$#i', $src) === 1) {

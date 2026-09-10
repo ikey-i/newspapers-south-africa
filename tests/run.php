@@ -225,9 +225,17 @@ check('keeps http link and adds rel', (function () use ($H) {
 check('strips <iframe>', !str_contains(strtolower($H::clean('<iframe src="https://evil"></iframe>')), 'iframe'));
 check('strips data: uri image', !str_contains(strtolower($H::clean('<img src="data:text/html;base64,x">')), 'data:'));
 check('keeps site-relative image', str_contains($H::clean('<img src="/uploads/media/a.jpg" alt="a">'), '/uploads/media/a.jpg'));
-check('unwraps unknown <div> but keeps text', (function () use ($H) {
-    $out = $H::clean('<div><span>kept text</span></div>');
-    return str_contains($out, 'kept text');
+check('turns a Trix text <div> into <p>', (function () use ($H) {
+    $out = $H::clean('<div>First para</div><div>Second para</div>');
+    return substr_count($out, '<p>') === 2 && str_contains($out, 'First para');
+})());
+check('demotes editor <h1> to <h2>', (function () use ($H) {
+    $out = $H::clean('<h1>Section heading</h1>');
+    return str_contains($out, '<h2>Section heading</h2>') && !str_contains($out, '<h1');
+})());
+check('keeps Trix figure/figcaption for an uploaded image', (function () use ($H) {
+    $out = $H::clean('<figure class="attachment"><img src="/uploads/media/x.jpg"><figcaption>Caption</figcaption></figure>');
+    return str_contains($out, '<figure>') && str_contains($out, '<figcaption>Caption</figcaption>') && str_contains($out, '/uploads/media/x.jpg');
 })());
 equals('empty stays empty', '', $H::clean(''));
 check('plain text passes through escaped-safe', str_contains($H::clean('5 < 7 and 8 > 2'), '5'));
