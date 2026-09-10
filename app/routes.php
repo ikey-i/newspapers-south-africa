@@ -12,6 +12,7 @@ use App\Controllers\Publish\AuthController as PublishAuthController;
 use App\Controllers\Publish\DashboardController as PublishDashboardController;
 use App\Controllers\Publish\EditionsController as PublishEditionsController;
 use App\Controllers\Publish\MediaController as PublishMediaController;
+use App\Controllers\Publish\NewspaperController as PublishNewspaperController;
 use App\Controllers\Publish\PasswordController as PublishPasswordController;
 use App\Controllers\BrowseController;
 use App\Controllers\EditionController;
@@ -83,6 +84,9 @@ $router->get('/publish/editions/{id}/edit', [PublishEditionsController::class, '
 $router->post('/publish/editions/{id}', [PublishEditionsController::class, 'update']);
 $router->post('/publish/editions/{id}/delete', [PublishEditionsController::class, 'destroy']);
 $router->post('/publish/editions/{id}/{action}', [PublishEditionsController::class, 'setStatus']);
+
+$router->get('/publish/newspaper', [PublishNewspaperController::class, 'edit']);
+$router->post('/publish/newspaper', [PublishNewspaperController::class, 'update']);
 
 // ---------------------------------------------------------------------------
 // Admin
