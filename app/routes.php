@@ -10,6 +10,7 @@ use App\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Controllers\Publish\ArticlesController as PublishArticlesController;
 use App\Controllers\Publish\AuthController as PublishAuthController;
 use App\Controllers\Publish\DashboardController as PublishDashboardController;
+use App\Controllers\Publish\EditionsController as PublishEditionsController;
 use App\Controllers\Publish\MediaController as PublishMediaController;
 use App\Controllers\Publish\PasswordController as PublishPasswordController;
 use App\Controllers\BrowseController;
@@ -74,6 +75,14 @@ $router->post('/publish/articles/{id}', [PublishArticlesController::class, 'upda
 $router->post('/publish/articles/{id}/delete', [PublishArticlesController::class, 'destroy']);
 $router->post('/publish/articles/{id}/{action}', [PublishArticlesController::class, 'setStatus']);
 $router->post('/publish/media', [PublishMediaController::class, 'store']);
+
+$router->get('/publish/editions', [PublishEditionsController::class, 'index']);
+$router->get('/publish/editions/new', [PublishEditionsController::class, 'create']);
+$router->post('/publish/editions', [PublishEditionsController::class, 'store']);
+$router->get('/publish/editions/{id}/edit', [PublishEditionsController::class, 'edit']);
+$router->post('/publish/editions/{id}', [PublishEditionsController::class, 'update']);
+$router->post('/publish/editions/{id}/delete', [PublishEditionsController::class, 'destroy']);
+$router->post('/publish/editions/{id}/{action}', [PublishEditionsController::class, 'setStatus']);
 
 // ---------------------------------------------------------------------------
 // Admin
