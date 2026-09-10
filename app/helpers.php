@@ -228,6 +228,8 @@ if (!function_exists('publish_view')) {
             'user'    => $data['user'] ?? \App\Support\PublisherAuth::user(),
             'success' => flash_pull('publish_success'),
             'notice'  => flash_pull('publish_notice'),
+            'head'    => (string) ($data['head'] ?? ''),
+            'scripts' => (string) ($data['scripts'] ?? ''),
         ]);
     }
 }

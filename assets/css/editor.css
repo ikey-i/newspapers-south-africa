@@ -1,0 +1,30 @@
+/* Article editor tweaks (loaded on the story form only, after Trix's own CSS) */
+
+trix-editor {
+    min-height: 22rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    padding: .8rem 1rem;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+trix-editor:empty:not(:focus)::before { color: var(--text-muted); }
+trix-editor h1 { font-size: 1.5rem; }
+trix-editor:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+trix-toolbar .trix-button-group {
+    border-color: var(--border);
+    background: var(--surface-alt);
+}
+trix-toolbar .trix-button {
+    border-bottom-color: var(--border);
+}
+trix-toolbar .trix-button:not(:first-child) { border-left-color: var(--border); }
+
+/* Trix's "heading" button emits <h1>; the sanitiser demotes it to <h2>. */
+
+.trix-content img { max-width: 100%; height: auto; border-radius: 6px; }
+.trix-content figure { margin: 1rem 0; }

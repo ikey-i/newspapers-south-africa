@@ -7,8 +7,10 @@ use App\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Controllers\Admin\NewspapersController as AdminNewspapersController;
 use App\Controllers\Admin\PublishersController as AdminPublishersController;
 use App\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Controllers\Publish\ArticlesController as PublishArticlesController;
 use App\Controllers\Publish\AuthController as PublishAuthController;
 use App\Controllers\Publish\DashboardController as PublishDashboardController;
+use App\Controllers\Publish\MediaController as PublishMediaController;
 use App\Controllers\Publish\PasswordController as PublishPasswordController;
 use App\Controllers\BrowseController;
 use App\Controllers\EditionController;
@@ -63,6 +65,15 @@ $router->get('/publish/reset', [PublishPasswordController::class, 'showReset']);
 $router->post('/publish/reset', [PublishPasswordController::class, 'reset']);
 
 $router->get('/publish', [PublishDashboardController::class, 'index']);
+
+$router->get('/publish/articles', [PublishArticlesController::class, 'index']);
+$router->get('/publish/articles/new', [PublishArticlesController::class, 'create']);
+$router->post('/publish/articles', [PublishArticlesController::class, 'store']);
+$router->get('/publish/articles/{id}/edit', [PublishArticlesController::class, 'edit']);
+$router->post('/publish/articles/{id}', [PublishArticlesController::class, 'update']);
+$router->post('/publish/articles/{id}/delete', [PublishArticlesController::class, 'destroy']);
+$router->post('/publish/articles/{id}/{action}', [PublishArticlesController::class, 'setStatus']);
+$router->post('/publish/media', [PublishMediaController::class, 'store']);
 
 // ---------------------------------------------------------------------------
 // Admin
