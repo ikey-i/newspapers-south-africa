@@ -7,7 +7,9 @@ of back issues. Newsrooms register a free publisher account to run their own
 online edition, and an admin area approves listings, moderates content and holds
 the Google AdSense settings.
 
-> **Status:** in active development. See the [Roadmap](#roadmap).
+> **Status:** feature-complete for a first launch — public directory, publisher
+> self-service (articles + PDF editions + profile), and a full admin area with
+> AdSense control. See the [Roadmap](#roadmap).
 
 ## Tech
 
@@ -37,8 +39,8 @@ php db/migrate.php
 # 3. Create your admin login
 php db/migrate.php create-admin admin "a-strong-password"
 
-# 4. (Optional) load demo content
-php db/seed.php
+# 4. (Optional) load demo content — 5 fictional newspapers, 20 stories, PDFs
+php db/seed.php          # add   ·   php db/seed.php --fresh   to reset it
 
 # 5. Run the site
 php -S localhost:8000 router.php
@@ -46,6 +48,9 @@ php -S localhost:8000 router.php
 
 Open <http://localhost:8000>. Before `config.php` exists or the schema is applied,
 the home page shows setup instructions instead of failing.
+
+`php db/seed.php` prints demo publisher logins (all with the password
+`demo-password-123`) so you can explore the `/publish` dashboard immediately.
 
 - **Admin** area: `/admin` (dashboard, newspapers, articles, editions,
   publishers, AdSense & settings).
@@ -139,9 +144,16 @@ db/
 |----|-------|--|
 | 1 | Scaffold: routing, database schema, admin shell, HTML sanitiser, CI. | ✅ |
 | 2 | Public directory: home, browse, newspaper & article pages, editions, search. | ✅ |
-| 3 | Publisher accounts: register, email verify, sign in, password reset. | |
-| 4 | Publisher dashboard — articles (rich-text editor, media uploads). | |
-| 5 | Publisher dashboard — editions & full-edition PDFs. | |
-| 6 | Publisher dashboard — newspaper profile / masthead. | |
-| 7 | Admin: newspaper approval & CRUD, article/edition moderation, publishers. | |
-| 8 | Demo dataset, UI polish, deployment docs. | |
+| 3 | Publisher accounts: register, email verify, sign in, password reset. | ✅ |
+| 4 | Publisher dashboard — articles (rich-text editor, media uploads). | ✅ |
+| 5 | Publisher dashboard — editions & full-edition PDFs. | ✅ |
+| 6 | Publisher dashboard — newspaper profile / masthead. | ✅ |
+| 7 | Admin: newspaper approval & CRUD, article/edition moderation, publishers. | ✅ |
+| 8 | Demo dataset, UI polish, deployment docs. | ✅ |
+
+### After launch
+
+- Curate a real directory: approve self-registered newsrooms, or add listings
+  in the admin area (they don't need a publisher account to appear).
+- Swap `mail.method` to `mail` and set up SPF/DKIM before inviting publishers.
+- Review `app/Views/pages/privacy.php` and `terms.php` with your own wording.

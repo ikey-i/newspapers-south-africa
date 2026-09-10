@@ -365,7 +365,7 @@ if (!function_exists('start_session')) {
             'samesite' => 'Lax',
             'secure'   => $https,
         ]);
-        session_name('rsa_session');
+        session_name('nsa_session');
         @session_start();
     }
 }
