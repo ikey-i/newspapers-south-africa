@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Controllers\Admin\AuthController as AdminAuthController;
 use App\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Controllers\Admin\NewspapersController as AdminNewspapersController;
+use App\Controllers\Admin\PublishersController as AdminPublishersController;
 use App\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Controllers\Publish\AuthController as PublishAuthController;
 use App\Controllers\Publish\DashboardController as PublishDashboardController;
@@ -69,6 +71,19 @@ $router->get('/admin', [AdminDashboardController::class, 'index']);
 $router->get('/admin/login', [AdminAuthController::class, 'showLogin']);
 $router->post('/admin/login', [AdminAuthController::class, 'login']);
 $router->post('/admin/logout', [AdminAuthController::class, 'logout']);
+
+$router->get('/admin/newspapers', [AdminNewspapersController::class, 'index']);
+$router->get('/admin/newspapers/new', [AdminNewspapersController::class, 'create']);
+$router->post('/admin/newspapers', [AdminNewspapersController::class, 'store']);
+$router->get('/admin/newspapers/{id}/edit', [AdminNewspapersController::class, 'edit']);
+$router->post('/admin/newspapers/{id}', [AdminNewspapersController::class, 'update']);
+$router->post('/admin/newspapers/{id}/delete', [AdminNewspapersController::class, 'destroy']);
+$router->post('/admin/newspapers/{id}/{action}', [AdminNewspapersController::class, 'setStatus']);
+
+$router->get('/admin/publishers', [AdminPublishersController::class, 'index']);
+$router->post('/admin/publishers/{id}/toggle', [AdminPublishersController::class, 'toggleActive']);
+$router->post('/admin/publishers/{id}/resend-verify', [AdminPublishersController::class, 'resendVerify']);
+$router->post('/admin/publishers/{id}/send-reset', [AdminPublishersController::class, 'sendReset']);
 
 $router->get('/admin/settings', [AdminSettingsController::class, 'edit']);
 $router->post('/admin/settings', [AdminSettingsController::class, 'update']);
