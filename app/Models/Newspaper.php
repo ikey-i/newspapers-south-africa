@@ -15,6 +15,36 @@ final class Newspaper
 {
     public const PER_PAGE = 24;
 
+    public static function slugTaken(string $slug): bool
+    {
+        return Database::first('SELECT 1 FROM newspapers WHERE slug = ?', [$slug]) !== null;
+    }
+
+    /**
+     * Insert a newspaper in the "pending" state (newsroom self-registration).
+     *
+     * @param array{name:string,type:string,province:?string,city:?string,website:?string} $paper
+     */
+    public static function createPending(array $paper): int
+    {
+        $slug = unique_slug($paper['name'], static fn (string $s): bool => self::slugTaken($s));
+
+        Database::execute(
+            "INSERT INTO newspapers (slug, name, type, province, city, website, status)
+             VALUES (?, ?, ?, ?, ?, ?, 'pending')",
+            [
+                $slug,
+                mb_substr(trim($paper['name']), 0, 160),
+                $paper['type'],
+                $paper['province'] ?: null,
+                $paper['city'] ? mb_substr($paper['city'], 0, 120) : null,
+                $paper['website'] ?: null,
+            ]
+        );
+
+        return (int) Database::connection()->lastInsertId();
+    }
+
     /** @return array<string,mixed>|null */
     public static function findActiveBySlug(string $slug): ?array
     {
