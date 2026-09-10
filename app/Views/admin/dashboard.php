@@ -18,14 +18,14 @@
         <span class="stat__value"><?= number_format($stats['publishers']) ?></span>
         <span class="stat__label">Publisher accounts</span>
     </a>
-    <div class="stat">
+    <a class="stat" href="<?= e(url('admin/articles?status=published')) ?>">
         <span class="stat__value"><?= number_format($stats['articles']) ?></span>
         <span class="stat__label">Published articles</span>
-    </div>
-    <div class="stat">
+    </a>
+    <a class="stat" href="<?= e(url('admin/editions')) ?>">
         <span class="stat__value"><?= number_format($stats['editions']) ?></span>
         <span class="stat__label">Published editions</span>
-    </div>
+    </a>
 </div>
 
 <div class="admin-actions">
