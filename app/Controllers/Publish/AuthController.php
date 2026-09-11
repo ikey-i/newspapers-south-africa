@@ -11,6 +11,7 @@ use App\Support\FormGuard;
 use App\Support\Mailer;
 use App\Support\PublisherAuth;
 use App\Support\RateLimiter;
+use App\Support\Recaptcha;
 use App\Support\Taxonomy;
 use App\Support\Validator;
 
@@ -37,6 +38,10 @@ final class AuthController
         }
         if (RateLimiter::tooMany('signup_attempts', 5, 60)) {
             $this->renderRegister(['email' => 'Too many sign-ups from this connection. Please try again later.']);
+            return;
+        }
+        if (!Recaptcha::verify($_POST['g-recaptcha-response'] ?? null)) {
+            $this->renderRegister(['captcha' => 'Please complete the CAPTCHA to continue.']);
             return;
         }
 
@@ -201,6 +206,7 @@ final class AuthController
             'guardField' => FormGuard::fields('publish_register'),
             'types'      => Taxonomy::TYPES,
             'provinces'  => Taxonomy::PROVINCES,
+            'captchaWidget' => Recaptcha::widget(),
             'layout_title' => 'Register your newspaper — ' . config('app.name'),
         ]);
     }

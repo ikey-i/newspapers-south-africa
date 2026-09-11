@@ -210,5 +210,8 @@ INSERT INTO settings (name, value) VALUES
     ('adsense_slot_infeed', ''),
     ('adsense_slot_article', ''),
     ('adsense_slot_sidebar', ''),
-    ('contact_email', '')
+    ('contact_email', ''),
+    ('recaptcha_enabled', '0'),
+    ('recaptcha_site_key', ''),
+    ('recaptcha_secret_key', '')
 ON DUPLICATE KEY UPDATE name = name;

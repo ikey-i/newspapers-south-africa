@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Support\Ads;
 use App\Support\Auth;
 use App\Support\Csrf;
+use App\Support\Recaptcha;
 use App\Support\Validator;
 
 final class SettingsController
@@ -38,6 +39,8 @@ final class SettingsController
         foreach (self::SLOT_KEYS as $slot) {
             $v->label('Ad slot ID')->optional($slot)->max($slot, 20);
         }
+        $v->label('reCAPTCHA site key')->optional('recaptcha_site_key')->max('recaptcha_site_key', 100);
+        $v->label('reCAPTCHA secret key')->optional('recaptcha_secret_key')->max('recaptcha_secret_key', 100);
 
         $in = $v->validated();
 
@@ -56,6 +59,15 @@ final class SettingsController
             }
         }
 
+        if (isset($_POST['recaptcha_enabled'])) {
+            if (trim((string) ($in['recaptcha_site_key'] ?? '')) === '') {
+                $v->addError('recaptcha_site_key', 'Enter a site key to enable reCAPTCHA.');
+            }
+            if (trim((string) ($in['recaptcha_secret_key'] ?? '')) === '') {
+                $v->addError('recaptcha_secret_key', 'Enter a secret key to enable reCAPTCHA.');
+            }
+        }
+
         if ($v->fails()) {
             $this->render($v->errors(), $_POST);
             return;
@@ -66,6 +78,9 @@ final class SettingsController
             'adsense_auto_ads'     => isset($_POST['adsense_auto_ads']) ? '1' : '0',
             'adsense_publisher_id' => $publisher,
             'contact_email'        => trim((string) ($in['contact_email'] ?? '')),
+            'recaptcha_enabled'    => isset($_POST['recaptcha_enabled']) ? '1' : '0',
+            'recaptcha_site_key'   => trim((string) ($in['recaptcha_site_key'] ?? '')),
+            'recaptcha_secret_key' => trim((string) ($in['recaptcha_secret_key'] ?? '')),
         ];
         foreach (self::SLOT_KEYS as $slot) {
             $values[$slot] = trim((string) ($in[$slot] ?? ''));
@@ -86,11 +101,12 @@ final class SettingsController
         $GLOBALS['old'] = $old !== [] ? $old : Setting::all();
 
         admin_view('admin/settings', [
-            'heading'   => 'Settings',
-            'errors'    => $errors,
-            'settings'  => Setting::all(),
-            'adsLive'   => Ads::enabled(),
-            'csrfField' => Csrf::field(),
+            'heading'      => 'Settings',
+            'errors'       => $errors,
+            'settings'     => Setting::all(),
+            'adsLive'      => Ads::enabled(),
+            'recaptchaLive' => Recaptcha::enabled(),
+            'csrfField'    => Csrf::field(),
         ]);
     }
 }
