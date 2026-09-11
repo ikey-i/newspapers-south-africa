@@ -94,10 +94,18 @@ final class Upload
         if (!in_array($kind, self::DIRS, true)) {
             return;
         }
-        $full = BASE_PATH . '/' . $relativePath;
-        if (is_file($full)) {
-            @unlink($full);
+
+        // All current callers only ever pass a path this class generated
+        // itself (read back from the database), so there is nothing to
+        // traverse with today — this is defense-in-depth in case that ever
+        // changes: refuse to unlink anything outside the matching upload dir.
+        $dir = realpath(self::dir($kind));
+        $full = realpath(BASE_PATH . '/' . $relativePath);
+        if ($dir === false || $full === false || !str_starts_with($full, $dir . DIRECTORY_SEPARATOR)) {
+            return;
         }
+
+        @unlink($full);
     }
 
     // -----------------------------------------------------------------------
