@@ -14,7 +14,15 @@
     var endpoint = form.getAttribute('data-media-endpoint');
     var token = form.getAttribute('data-token') || '';
 
+    // fallbackToTextarea can be reached from more than one place (a failed
+    // script load, and the safety-net timeout below) — guard so a second call
+    // is a no-op instead of touching an element already removed from the DOM.
+    var fellBack = false;
     function fallbackToTextarea() {
+        if (fellBack) { return; }
+        fellBack = true;
+        clearTimeout(fallbackTimer);
+
         var ta = document.createElement('textarea');
         ta.className = 'field__control';
         ta.rows = 18;
@@ -26,7 +34,7 @@
     // Trix mirrors its HTML into the hidden input automatically, but make sure
     // the latest value is there on submit.
     form.addEventListener('submit', function () {
-        if (editor && editor.editor) { hidden.value = editor.value; }
+        if (!fellBack && editor.editor) { hidden.value = editor.value; }
     });
 
     var css = document.createElement('link');
@@ -41,11 +49,12 @@
     script.onload = wire;
     document.head.appendChild(script);
 
-    // Safety net: if Trix hasn't initialised in a few seconds, fall back.
+    // Safety net: if Trix hasn't initialised in a few seconds (slow or
+    // silently-blocked CDN), fall back.
     var initialised = false;
     document.addEventListener('trix-initialize', function () { initialised = true; });
-    setTimeout(function () {
-        if (!initialised && (!window.Trix)) { fallbackToTextarea(); }
+    var fallbackTimer = setTimeout(function () {
+        if (!initialised && !window.Trix) { fallbackToTextarea(); }
     }, 6000);
 
     function wire() {
