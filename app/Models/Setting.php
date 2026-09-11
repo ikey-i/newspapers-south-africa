@@ -25,6 +25,9 @@ final class Setting
         'adsense_slot_article' => '',
         'adsense_slot_sidebar' => '',
         'contact_email'        => '',
+        'recaptcha_enabled'    => '0',
+        'recaptcha_site_key'   => '',
+        'recaptcha_secret_key' => '',
     ];
 
     public static function get(string $key, ?string $default = null): string

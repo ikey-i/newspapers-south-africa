@@ -105,6 +105,16 @@ Verification and password-reset emails go through `App\Support\Mailer`. Set
 
   Check it works before inviting publishers: `php scripts/test-mail.php you@example.com`.
 
+### CAPTCHA on newspaper sign-up
+
+Off by default. Turn it on in `/admin/settings` (reCAPTCHA section): register a
+**reCAPTCHA v2 ("I'm not a robot" checkbox)** site at
+[google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) — add every
+domain you'll use, including `localhost` while testing — then paste the site
+key and secret key in and check the box. `App\Support\Recaptcha` handles the
+widget and server-side verification (`api/siteverify`, fails closed if Google
+is unreachable); nothing else needs to change.
+
 ### Tests
 
 ```bash

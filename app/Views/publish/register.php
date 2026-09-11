@@ -4,6 +4,7 @@
 /** @var string $guardField */
 /** @var array<string,string> $types */
 /** @var list<string> $provinces */
+/** @var string $captchaWidget */
 $field = static fn (array $a): string => view('partials/field', $a);
 $err = static fn (string $k): string => $errors[$k] ?? '';
 ?>
@@ -38,6 +39,13 @@ $err = static fn (string $k): string => $errors[$k] ?? '';
         <p class="field__hint">By registering you agree to our
             <a href="<?= e(url('terms')) ?>" target="_blank" rel="noopener">terms</a> and
             <a href="<?= e(url('privacy')) ?>" target="_blank" rel="noopener">privacy policy</a>.</p>
+
+        <?php if ($captchaWidget !== ''): ?>
+            <div class="field<?= $err('captcha') !== '' ? ' field--error' : '' ?>">
+                <?= $captchaWidget ?>
+                <?php if ($err('captcha') !== ''): ?><p class="field__error"><?= e($err('captcha')) ?></p><?php endif ?>
+            </div>
+        <?php endif ?>
 
         <button class="form__submit" type="submit">Create account</button>
     </form>

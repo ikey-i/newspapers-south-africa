@@ -36,6 +36,7 @@ require APP_PATH . '/Support/Upload.php';
 require APP_PATH . '/Database.php';
 require APP_PATH . '/Models/Setting.php';
 require APP_PATH . '/Support/Ads.php';
+require APP_PATH . '/Support/Recaptcha.php';
 
 ob_start();
 
@@ -297,6 +298,16 @@ equals('no head script when disabled', '', $Ads::headScript());
 equals('article slot known but empty when disabled', '', $Ads::slot('article'));
 equals('sidebar slot known but empty when disabled', '', $Ads::slot('sidebar'));
 equals('unknown slot name is empty', '', $Ads::slot('nope'));
+
+// ---------------------------------------------------------------------------
+echo "Recaptcha\n";
+$R = \App\Support\Recaptcha::class;
+// No database in the test runner -> settings fall back to defaults (disabled).
+check('disabled by default', !$R::enabled());
+equals('no site key when disabled', '', $R::siteKey());
+equals('no widget markup when disabled', '', $R::widget());
+check('verify() passes through when disabled (nothing to check)', $R::verify(null));
+check('verify() passes through an empty token when disabled', $R::verify(''));
 
 // ---------------------------------------------------------------------------
 echo "\n{$passed} passed, {$failed} failed\n";

@@ -2,6 +2,7 @@
 /** @var array<string,string> $errors */
 /** @var array<string,string> $settings */
 /** @var bool $adsLive */
+/** @var bool $recaptchaLive */
 /** @var string $csrfField */
 
 $field = static fn (array $a): string => view('partials/field', $a);
@@ -57,6 +58,33 @@ $checked = static function (string $k) use ($isSubmit): bool {
     <?= $field(['name' => 'adsense_slot_sidebar', 'label' => 'Sidebar (newspaper and article pages)',
                 'value' => (string) ($GLOBALS['old']['adsense_slot_sidebar'] ?? ''), 'error' => $err('adsense_slot_sidebar')]) ?>
 
+    <h2 class="form__section">reCAPTCHA</h2>
+
+    <p class="admin-status">
+        The newspaper sign-up form is currently
+        <strong><?= $recaptchaLive ? 'protected by reCAPTCHA' : 'not using a CAPTCHA' ?></strong>.
+        <?php if (!$recaptchaLive): ?>
+            Enable it and add both keys below.
+        <?php endif ?>
+    </p>
+
+    <label class="checkbox">
+        <input type="checkbox" name="recaptcha_enabled" value="1" <?= $checked('recaptcha_enabled') ? 'checked' : '' ?>>
+        Require reCAPTCHA when a newsroom registers
+    </label>
+
+    <?= $field([
+        'name' => 'recaptcha_site_key', 'label' => 'reCAPTCHA site key',
+        'hint' => 'From your reCAPTCHA v2 ("I\'m not a robot" checkbox) site at google.com/recaptcha/admin.',
+        'value' => (string) ($GLOBALS['old']['recaptcha_site_key'] ?? ''),
+        'error' => $err('recaptcha_site_key'),
+    ]) ?>
+    <?= $field([
+        'name' => 'recaptcha_secret_key', 'label' => 'reCAPTCHA secret key',
+        'value' => (string) ($GLOBALS['old']['recaptcha_secret_key'] ?? ''),
+        'error' => $err('recaptcha_secret_key'),
+    ]) ?>
+
     <h2 class="form__section">General</h2>
     <?= $field(['name' => 'contact_email', 'label' => 'Contact email', 'type' => 'email',
                 'hint' => 'Shown on the privacy and terms pages.',
@@ -72,4 +100,9 @@ $checked = static function (string $k) use ($isSubmit): bool {
     is generated automatically. AdSense also needs a privacy policy — a starter one
     lives at <a href="<?= e(url('privacy')) ?>">/privacy</a>; edit it in
     <code>app/Views/pages/privacy.php</code>.
+</p>
+<p class="admin-note">
+    Register a reCAPTCHA v2 ("I'm not a robot" checkbox) site at
+    <a href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener">google.com/recaptcha/admin</a>
+    with this site's domain(s) — include <code>localhost</code> while testing locally.
 </p>
