@@ -32,6 +32,7 @@ require APP_PATH . '/Support/FormGuard.php';
 require APP_PATH . '/Support/HtmlSanitizer.php';
 require APP_PATH . '/Support/SmtpClient.php';
 require APP_PATH . '/Support/Mailer.php';
+require APP_PATH . '/Support/Upload.php';
 require APP_PATH . '/Database.php';
 require APP_PATH . '/Models/Setting.php';
 require APP_PATH . '/Support/Ads.php';
@@ -265,6 +266,25 @@ if ($new !== []) {
 } else {
     check('a log file was written', false);
 }
+
+// ---------------------------------------------------------------------------
+echo "Upload::delete (path containment)\n";
+$U = \App\Support\Upload::class;
+$logosDir = BASE_PATH . '/uploads/logos';
+@mkdir($logosDir, 0755, true);
+$victimOutside = BASE_PATH . '/uploads-delete-test-victim.txt';
+file_put_contents($victimOutside, 'do not delete me');
+$U::delete('uploads/logos/../../uploads-delete-test-victim.txt');
+check('refuses to delete outside its own upload dir (traversal)', is_file($victimOutside));
+@unlink($victimOutside);
+
+$insideFile = $logosDir . '/delete-test.txt';
+file_put_contents($insideFile, 'ok to delete');
+$U::delete('uploads/logos/delete-test.txt');
+check('deletes a real file inside the matching upload dir', !is_file($insideFile));
+
+check('ignores an empty path', (function () use ($U) { $U::delete(''); return true; })());
+check('ignores a path outside uploads/', (function () use ($U) { $U::delete('config.php'); return is_file(BASE_PATH . '/config.sample.php'); })());
 
 // ---------------------------------------------------------------------------
 echo "Ads\n";
