@@ -34,9 +34,20 @@ return [
     'mail' => [
         // 'log'  — write messages to var/mail/ instead of sending (local dev).
         // 'mail' — use PHP's mail() (cPanel / shared hosting default).
+        // 'smtp' — deliver via the mail.smtp settings below (a real mailbox
+        //          or transactional-email provider — better deliverability).
         'method' => 'log',
         // From address for verification and password-reset emails.
         'from'      => 'no-reply@localhost',
         'from_name' => 'Newspapers South Africa',
+
+        // Only used when method = 'smtp'.
+        'smtp' => [
+            'host'       => '',            // e.g. smtp.yourhost.co.za
+            'port'       => 587,            // 587 = STARTTLS, 465 = implicit TLS, 25 = none
+            'encryption' => 'tls',          // 'tls' | 'ssl' | 'none'
+            'username'   => '',
+            'password'   => '',
+        ],
     ],
 ];
