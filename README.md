@@ -82,8 +82,28 @@ Verification and password-reset emails go through `App\Support\Mailer`. Set
 `mail.method` in `config.php`:
 
 - `log` — write the message to `var/mail/` (local dev, no mail server needed).
-- `mail` — use PHP's `mail()` (cPanel default). Set SPF/DKIM on the domain for
-  deliverability; the mailer stays swappable for SMTP later.
+- `mail` — use PHP's `mail()` (cPanel default). Deliverability depends on the
+  host's mail setup — set SPF/DKIM on the domain.
+- `smtp` — deliver through a real mailbox or transactional-email provider via
+  `App\Support\SmtpClient` (no Composer dependency — a small built-in client
+  supporting STARTTLS/implicit TLS and AUTH LOGIN). Fill in `mail.smtp.*`:
+
+  ```php
+  'mail' => [
+      'method' => 'smtp',
+      'from'      => 'no-reply@yourdomain.co.za',
+      'from_name' => 'Your Site Name',
+      'smtp' => [
+          'host'       => 'smtp.yourhost.co.za',
+          'port'       => 587,     // 587 = STARTTLS, 465 = implicit TLS, 25 = none
+          'encryption' => 'tls',
+          'username'   => 'no-reply@yourdomain.co.za',
+          'password'   => '…',
+      ],
+  ],
+  ```
+
+  Check it works before inviting publishers: `php scripts/test-mail.php you@example.com`.
 
 ### Tests
 

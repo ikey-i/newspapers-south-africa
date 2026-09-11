@@ -30,6 +30,8 @@ require APP_PATH . '/Support/Validator.php';
 require APP_PATH . '/Support/Csrf.php';
 require APP_PATH . '/Support/FormGuard.php';
 require APP_PATH . '/Support/HtmlSanitizer.php';
+require APP_PATH . '/Support/SmtpClient.php';
+require APP_PATH . '/Support/Mailer.php';
 require APP_PATH . '/Database.php';
 require APP_PATH . '/Models/Setting.php';
 require APP_PATH . '/Support/Ads.php';
@@ -245,6 +247,24 @@ echo "Upload::pdf validation (pure parts)\n";
 // magic-byte logic is exercised via a tiny reflection-free helper check:
 check('a %PDF- header string starts a pdf', str_starts_with("%PDF-1.7\n...", '%PDF-'));
 check('an MZ header string does not', !str_starts_with("MZ\x90\x00", '%PDF-'));
+
+// ---------------------------------------------------------------------------
+echo "Mailer (log backend)\n";
+$Mailer = \App\Support\Mailer::class;
+$mailDir = BASE_PATH . '/var/mail';
+$before = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
+check('rejects an invalid recipient', !$Mailer::send('not-an-email', 'Subject', 'Body'));
+check('sends (logs) to a valid recipient', $Mailer::send('reader@example.com', "Injected\r\nBcc: evil@example.com", 'Body text'));
+$after = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
+$new = array_values(array_diff($after, $before));
+if ($new !== []) {
+    $content = (string) file_get_contents($new[0]);
+    check('strips CRLF from the subject (no header injection)', !str_contains($content, "Injected\r\nBcc"));
+    check('subject header still present, flattened onto one line', str_contains($content, 'Subject: Injected') && str_contains($content, 'Bcc: evil@example.com'));
+    @unlink($new[0]); // don't leave test fixtures behind
+} else {
+    check('a log file was written', false);
+}
 
 // ---------------------------------------------------------------------------
 echo "Ads\n";
