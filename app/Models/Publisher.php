@@ -26,7 +26,12 @@ final class Publisher
         if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
             return null;
         }
-        return Database::first('SELECT * FROM publishers WHERE verify_token = ?', [$token]);
+        return Database::first(
+            'SELECT p.*, n.name AS newspaper_name, n.slug AS newspaper_slug, n.status AS newspaper_status
+             FROM publishers p JOIN newspapers n ON n.id = p.newspaper_id
+             WHERE p.verify_token = ?',
+            [$token]
+        );
     }
 
     public static function emailTaken(string $email): bool

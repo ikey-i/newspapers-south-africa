@@ -211,6 +211,7 @@ INSERT INTO settings (name, value) VALUES
     ('adsense_slot_article', ''),
     ('adsense_slot_sidebar', ''),
     ('contact_email', ''),
+    ('admin_notify_email', ''),
     ('recaptcha_enabled', '0'),
     ('recaptcha_site_key', ''),
     ('recaptcha_secret_key', '')

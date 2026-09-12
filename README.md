@@ -53,7 +53,9 @@ the home page shows setup instructions instead of failing.
 `demo-password-123`) so you can explore the `/publish` dashboard immediately.
 
 - **Admin** area: `/admin` (dashboard, newspapers, articles, editions,
-  publishers, AdSense & settings).
+  publishers, AdSense & settings). Set an **admin notification email** in
+  Settings to get an email whenever a newsroom verifies its address and is
+  ready for review — otherwise you'll only see it as a count on the dashboard.
 - **Publisher** area: `/publish` (register, verify email, sign in, then manage
   your newspaper, articles and PDF editions).
 

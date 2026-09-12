@@ -35,6 +35,7 @@ final class SettingsController
 
         $v = new Validator($_POST);
         $v->label('Contact email')->optional('contact_email')->email('contact_email')->max('contact_email', 160);
+        $v->label('Admin notification email')->optional('admin_notify_email')->email('admin_notify_email')->max('admin_notify_email', 160);
         $v->label('Publisher ID')->optional('adsense_publisher_id')->max('adsense_publisher_id', 40);
         foreach (self::SLOT_KEYS as $slot) {
             $v->label('Ad slot ID')->optional($slot)->max($slot, 20);
@@ -78,6 +79,7 @@ final class SettingsController
             'adsense_auto_ads'     => isset($_POST['adsense_auto_ads']) ? '1' : '0',
             'adsense_publisher_id' => $publisher,
             'contact_email'        => trim((string) ($in['contact_email'] ?? '')),
+            'admin_notify_email'   => trim((string) ($in['admin_notify_email'] ?? '')),
             'recaptcha_enabled'    => isset($_POST['recaptcha_enabled']) ? '1' : '0',
             'recaptcha_site_key'   => trim((string) ($in['recaptcha_site_key'] ?? '')),
             'recaptcha_secret_key' => trim((string) ($in['recaptcha_secret_key'] ?? '')),
