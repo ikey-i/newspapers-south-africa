@@ -50,4 +50,16 @@ return [
             'password'   => '',
         ],
     ],
+
+    // Who is legally operating this site — shown on /privacy and /terms.
+    // POPIA (South Africa's data protection act) requires every "responsible
+    // party" to name a registered Information Officer; if that's you, your
+    // own details are fine. Fill these in before launch.
+    'legal' => [
+        'operator_name'      => '[Your name or registered business name]',
+        'operator_address'   => '[Your registered/physical address, city, South Africa]',
+        'info_officer_name'  => '[Information Officer name]',
+        // Falls back to the "Contact email" set in /admin/settings if left blank.
+        'info_officer_email' => '',
+    ],
 ];

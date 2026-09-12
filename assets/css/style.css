@@ -483,6 +483,15 @@ h1, h2, h3, h4 { font-family: var(--serif); line-height: 1.2; font-weight: 600; 
 .prose img { border-radius: 8px; margin: 1.2rem 0; }
 .prose figure { margin: 1.5rem 0; }
 .prose figcaption { color: var(--ink-faint); font-size: .85rem; margin-top: .4rem; }
+.table-plain-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+.table-plain { width: 100%; min-width: 40rem; border-collapse: collapse; font-size: .92rem; }
+.table-plain th, .table-plain td {
+    text-align: left;
+    vertical-align: top;
+    padding: .6rem .8rem;
+    border: 1px solid var(--line);
+}
+.table-plain th { background: var(--surface); font-weight: 600; }
 .prose blockquote {
     border-left: 3px solid var(--brand);
     margin: 1.5rem 0;
