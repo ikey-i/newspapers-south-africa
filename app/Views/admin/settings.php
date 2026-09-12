@@ -89,6 +89,9 @@ $checked = static function (string $k) use ($isSubmit): bool {
     <?= $field(['name' => 'contact_email', 'label' => 'Contact email', 'type' => 'email',
                 'hint' => 'Shown on the privacy and terms pages.',
                 'value' => (string) ($GLOBALS['old']['contact_email'] ?? ''), 'error' => $err('contact_email')]) ?>
+    <?= $field(['name' => 'admin_notify_email', 'label' => 'Admin notification email', 'type' => 'email',
+                'hint' => 'Gets an email whenever a newsroom verifies its address and is ready for your review. Leave blank to only see it on the dashboard.',
+                'value' => (string) ($GLOBALS['old']['admin_notify_email'] ?? ''), 'error' => $err('admin_notify_email')]) ?>
 
     <div class="admin-form__footer">
         <button class="form__submit" type="submit">Save settings</button>

@@ -6,6 +6,7 @@ namespace App\Controllers\Publish;
 
 use App\Database;
 use App\Models\Publisher;
+use App\Models\Setting;
 use App\Support\Csrf;
 use App\Support\FormGuard;
 use App\Support\Mailer;
@@ -122,6 +123,7 @@ final class AuthController
 
         Publisher::markVerified((int) $publisher['id']);
         PublisherAuth::login((int) $publisher['id']);
+        $this->notifyAdminOfPendingNewspaper($publisher);
 
         flash('publish_success', 'Your email is verified. Thanks!');
         redirect(url('publish'));
@@ -182,6 +184,35 @@ final class AuthController
     }
 
     // -----------------------------------------------------------------------
+
+    /**
+     * Let the site admin know a newsroom is ready for review, so approvals
+     * don't rely on someone remembering to check the dashboard. No-op if no
+     * admin notification address is configured, or the newspaper was already
+     * handled (e.g. approved before the owner got around to verifying).
+     *
+     * @param array<string,mixed> $publisher
+     */
+    private function notifyAdminOfPendingNewspaper(array $publisher): void
+    {
+        if (($publisher['newspaper_status'] ?? null) !== 'pending') {
+            return;
+        }
+        $to = Setting::get('admin_notify_email');
+        if ($to === '') {
+            return;
+        }
+
+        $site = config('app.name');
+        $reviewLink = base_url('admin/newspapers?status=pending');
+        $body = "A newsroom has verified their email and is ready for review:\n\n"
+              . "  Newspaper: {$publisher['newspaper_name']}\n"
+              . "  Contact:   {$publisher['name']} <{$publisher['email']}>\n\n"
+              . "Review it here:\n{$reviewLink}\n\n"
+              . "— {$site}";
+
+        Mailer::send($to, "New newspaper awaiting approval: {$publisher['newspaper_name']}", $body);
+    }
 
     private function sendVerifyEmail(string $email, string $name, string $token): void
     {
