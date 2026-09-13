@@ -126,19 +126,66 @@ php tests/run.php
 A dependency-free runner covering the pure logic (slugs, escaping, routing, the
 HTML sanitiser, ad config, taxonomy). It runs in CI on PHP 8.1, 8.2 and 8.3.
 
-## Deployment (cPanel)
+## Deployment (shared hosting: DirectAdmin or cPanel)
 
-1. Point the domain's document root at the repository root.
-2. Create a MySQL database and user in cPanel and grant access.
-3. Copy `config.sample.php` to `config.php`; fill in the production database
-   credentials, `app.url`, `mail.*`, and set `app.env` to `production` and
-   `app.debug` to `false`.
-4. Apply the schema: `php db/migrate.php` over SSH, or import `db/schema.sql`
-   through phpMyAdmin.
-5. Create the admin login: `php db/migrate.php create-admin <user> <pass>`.
-6. Confirm `mod_rewrite` is enabled.
+No Composer, no build step — the checked-out repo *is* the deployed site. The
+steps are the same shape on DirectAdmin and cPanel; panel-specific names are
+noted in brackets.
 
-`db/schema.sql` is safe to re-run — every statement uses `IF NOT EXISTS`.
+1. **Create the domain/subdomain** in the panel (DirectAdmin: *Domain Setup* →
+   *Subdomain Management*, or *Add Additional Domain* if it's not a subdomain
+   of one already on the account; cPanel: *Domains* / *Subdomains*) and note
+   its document root.
+2. **Get the code onto the server**, with the document root pointed at the
+   **repository root** (not a `public/` subfolder — this app has none):
+   - Preferred: SSH in (DirectAdmin: *SSH Keys* under *Advanced Features* to
+     enable/add a key if it isn't already) and `git clone` the repo straight
+     into the document root, so future updates are `git pull`.
+   - Otherwise: download a zip of the repo and upload/extract it into the
+     document root via *File Manager*.
+3. **Create a MySQL database and user** (DirectAdmin: *MySQL Management*;
+   cPanel: *MySQL® Databases*) and grant the user full privileges on it. Both
+   panels prefix the names with your account username
+   (`username_newspapers`, `username_dbuser`) — that's normal, just use the
+   full prefixed names in `config.php`.
+4. **Configure**: `cp config.sample.php config.php`, then fill in —
+   - `app.url` — the site's `https://` address, no trailing slash.
+   - `app.env` → `production`, `app.debug` → `false`.
+   - `db.*` — the prefixed database name/user/password from step 3.
+   - `mail.*` — see [Email](#email) above; a mailbox created in the same
+     panel (DirectAdmin/cPanel: *Email Accounts*) works well with
+     `mail.method = 'smtp'`.
+   - `legal.*` — your operator name/address and POPIA Information Officer
+     details (see the comments in `config.sample.php`) — `/privacy` and
+     `/terms` show a banner until this is filled in.
+5. **Apply the schema**: `php db/migrate.php` over SSH (safe to re-run — every
+   statement uses `IF NOT EXISTS`), or import `db/schema.sql` through
+   phpMyAdmin if SSH isn't available.
+6. **Create the admin login**: `php db/migrate.php create-admin <user> <pass>`.
+7. **Enable SSL** for the domain (DirectAdmin: *SSL Certificates* → Let's
+   Encrypt, one click; cPanel: *SSL/TLS Status* → AutoSSL) and force HTTPS —
+   set `app.url` to `https://` *before* this step so links are correct.
+8. **Raise the upload limit** for PDF editions if the panel's default
+   `post_max_size`/`upload_max_filesize` is under ~25 MB: most DirectAdmin and
+   cPanel setups (PHP-FPM or suPHP) honour a `.user.ini` dropped in the
+   document root:
+   ```ini
+   upload_max_filesize = 30M
+   post_max_size = 32M
+   ```
+9. **Confirm `mod_rewrite`** is on (it almost always is on both panels; if
+   clean URLs 404, this is the first thing to check).
+10. **Set up email deliverability**: create the mailbox, then in the panel's
+    *DNS Management* confirm an SPF record exists for the domain (DirectAdmin
+    adds one by default) and turn on **DKIM** (DirectAdmin: one checkbox per
+    domain in DNS Management). Verify with `php scripts/test-mail.php you@example.com`
+    before inviting publishers.
+11. **reCAPTCHA / AdSense**: register the *live* domain at
+    [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) and
+    in AdSense, then paste the keys into `/admin/settings`.
+12. **Back up** the database and `/uploads` regularly — most panels have a
+    built-in scheduled backup feature (DirectAdmin: *Admin Backup/Transfer*)
+    worth turning on for both.
 
 ## Project layout
 
