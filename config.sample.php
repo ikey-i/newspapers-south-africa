@@ -20,6 +20,12 @@ return [
         'timezone' => 'Africa/Johannesburg',
         // Trust X-Forwarded-For / CF-Connecting-IP (only behind a known proxy).
         'trust_proxy' => false,
+        // A one-time secret for /setup.php — the web-based installer for hosts
+        // with no shell access. Leave blank to keep /setup.php refusing to run
+        // at all. Set it to a long random string before your first deploy,
+        // visit /setup.php?token=<that string>, then blank this again (or
+        // delete setup.php) once your admin account exists — see the README.
+        'setup_token' => '',
     ],
 
     'db' => [
