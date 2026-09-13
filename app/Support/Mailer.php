@@ -57,9 +57,20 @@ final class Mailer
                 $headers,
                 static fn (string $h): bool => !str_starts_with($h, 'To: ') && !str_starts_with($h, 'Subject: ')
             ));
-            return @mail($to, $subject, $body, implode("\r\n", $mailHeaders));
+            $sent = @mail($to, $subject, $body, implode("\r\n", $mailHeaders));
+            if (!$sent) {
+                error_log("Mailer (mail()): PHP's mail() returned false sending to {$to}.");
+            }
+            return $sent;
         }
 
+        // 'log' (or anything unrecognised): nothing is actually delivered.
+        // On a live site that almost always means mail.method was never
+        // switched from the local-dev default — say so where it'll be seen.
+        if ((string) config('app.env', 'local') === 'production') {
+            error_log("Mailer: mail.method is 'log' in production — no email was sent to {$to}. "
+                . "Set mail.method to 'smtp' or 'mail' in config.php.");
+        }
         return self::logMessage($headers, $body);
     }
 

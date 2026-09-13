@@ -29,8 +29,10 @@ final class DashboardController
         ];
 
         admin_view('admin/dashboard', [
-            'heading' => 'Dashboard',
-            'stats'   => $stats,
+            'heading'          => 'Dashboard',
+            'stats'            => $stats,
+            'mailNotSending'   => (string) config('app.env', 'local') === 'production'
+                && (string) config('mail.method', 'log') === 'log',
         ]);
     }
 }

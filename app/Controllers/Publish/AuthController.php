@@ -90,13 +90,28 @@ final class AuthController
             ]
         );
 
-        $this->sendVerifyEmail((string) $in['email'], (string) $in['name'], $token);
+        if (!$this->sendVerifyEmail((string) $in['email'], (string) $in['name'], $token)) {
+            flash('publish_mail_failed', true);
+        }
 
         redirect(url('publish/register/sent'));
     }
 
     public function registerSent(): void
     {
+        if (flash_pull('publish_mail_failed')) {
+            render('publish/notice', [
+                'heading' => 'Account created — but the email didn\'t go out',
+                'body'    => 'Your account and newspaper were created, but we could not send the verification '
+                           . 'email (a mail server problem on our end, not yours). Sign in below — you can sign '
+                           . 'in before verifying — and use "Resend the email" on your dashboard once the mail '
+                           . 'setup is fixed. If this keeps happening, contact the site administrator.',
+                'link'    => ['href' => url('publish/login'), 'label' => 'Go to sign in'],
+                'layout_title' => 'Account created — ' . config('app.name'),
+            ]);
+            return;
+        }
+
         render('publish/notice', [
             'heading' => 'Check your email',
             'body'    => 'We have sent a verification link to your email address. Click it to confirm your account. '
@@ -139,8 +154,12 @@ final class AuthController
             redirect(url('publish'));
         }
         $token = Publisher::refreshVerifyToken((int) $user['id']);
-        $this->sendVerifyEmail((string) $user['email'], (string) $user['name'], $token);
-        flash('publish_success', 'We have sent another verification email.');
+        if ($this->sendVerifyEmail((string) $user['email'], (string) $user['name'], $token)) {
+            flash('publish_success', 'We have sent another verification email.');
+        } else {
+            flash('publish_notice', 'We could not send the verification email — there is a mail server problem '
+                . 'on our end. Please try again shortly, or contact the site administrator.');
+        }
         redirect(url('publish'));
     }
 
@@ -214,7 +233,7 @@ final class AuthController
         Mailer::send($to, "New newspaper awaiting approval: {$publisher['newspaper_name']}", $body);
     }
 
-    private function sendVerifyEmail(string $email, string $name, string $token): void
+    private function sendVerifyEmail(string $email, string $name, string $token): bool
     {
         $link = base_url('publish/verify?token=' . $token);
         $site = config('app.name');
@@ -223,7 +242,7 @@ final class AuthController
               . "Confirm your email address by opening this link:\n{$link}\n\n"
               . "If you didn't request this, you can ignore this message.\n\n"
               . "— {$site}";
-        Mailer::send($email, "Confirm your {$site} account", $body);
+        return Mailer::send($email, "Confirm your {$site} account", $body);
     }
 
     /** @param array<string,string> $errors */
