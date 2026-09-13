@@ -254,19 +254,33 @@ check('an MZ header string does not', !str_starts_with("MZ\x90\x00", '%PDF-'));
 echo "Mailer (log backend)\n";
 $Mailer = \App\Support\Mailer::class;
 $mailDir = BASE_PATH . '/var/mail';
-$before = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
-check('rejects an invalid recipient', !$Mailer::send('not-an-email', 'Subject', 'Body'));
-check('sends (logs) to a valid recipient', $Mailer::send('reader@example.com', "Injected\r\nBcc: evil@example.com", 'Body text'));
-$after = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
-$new = array_values(array_diff($after, $before));
-if ($new !== []) {
+
+function mail_test_send_and_capture(string $mailer, string $mailDir, string $to, string $subject, string $body): ?string
+{
+    $before = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
+    $mailer::send($to, $subject, $body);
+    $after = is_dir($mailDir) ? glob($mailDir . '/*.txt') : [];
+    $new = array_values(array_diff($after, $before));
+    if ($new === []) {
+        return null;
+    }
     $content = (string) file_get_contents($new[0]);
-    check('strips CRLF from the subject (no header injection)', !str_contains($content, "Injected\r\nBcc"));
-    check('subject header still present, flattened onto one line', str_contains($content, 'Subject: Injected') && str_contains($content, 'Bcc: evil@example.com'));
-    @unlink($new[0]); // don't leave test fixtures behind
-} else {
-    check('a log file was written', false);
+    foreach ($new as $f) { @unlink($f); } // don't leave test fixtures behind
+    return $content;
 }
+
+check('rejects an invalid recipient', !$Mailer::send('not-an-email', 'Subject', 'Body'));
+
+$content = mail_test_send_and_capture($Mailer, $mailDir, 'reader@example.com', "Injected\r\nBcc: evil@example.com", 'Body text');
+check('sends (logs) to a valid recipient', $content !== null);
+check('strips CRLF from the subject (no header injection)', $content !== null && !str_contains($content, "Injected\r\nBcc"));
+check('subject header still present, flattened onto one line', $content !== null
+    && str_contains($content, 'Subject: Injected') && str_contains($content, 'Bcc: evil@example.com'));
+
+$GLOBALS['config']['app']['env'] = 'production';
+$prodContent = mail_test_send_and_capture($Mailer, $mailDir, 'reader@example.com', 'Prod test', 'Body');
+$GLOBALS['config']['app']['env'] = 'local';
+check('still delivers to var/mail/ even in production (just also warns)', $prodContent !== null);
 
 // ---------------------------------------------------------------------------
 echo "Upload::delete (path containment)\n";

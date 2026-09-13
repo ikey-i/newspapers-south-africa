@@ -1,6 +1,16 @@
 <?php
 /** @var array<string,int> $stats */
+/** @var bool $mailNotSending */
 ?>
+<?php if ($mailNotSending): ?>
+<p class="notice notice--warn">
+    <strong>No email is actually being sent.</strong> <code>mail.method</code> in
+    <code>config.php</code> is still <code>'log'</code> — verification, password-reset and
+    approval emails are being written to <code>var/mail/</code> on the server instead of
+    delivered. Set it to <code>'smtp'</code> or <code>'mail'</code> (see the README's
+    <em>Email</em> section) to fix this.
+</p>
+<?php endif ?>
 <div class="stat-grid">
     <a class="stat<?= $stats['papers_pending'] > 0 ? ' stat--warn' : '' ?>" href="<?= e(url('admin/newspapers?status=pending')) ?>">
         <span class="stat__value"><?= number_format($stats['papers_pending']) ?></span>
